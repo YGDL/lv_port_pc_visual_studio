@@ -43,5 +43,5 @@ void ui_init(void)
 
 void ui_destroy(void)
 {
-    ui_Screen1_screen_destroy();
+    //ui_Screen1_screen_destroy();
 }

@@ -699,6 +699,24 @@
     </ClInclude>
     <ClInclude Include="lv_conf.h" />
     <ClInclude Include="lv_drv_conf.h" />
+    <ClInclude Include="ui\ui.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\ui_events.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\ui_setting.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\ui_helpers.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\ui_top.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="lvgl\src\font\use_font_loader.h">
+      <Filter>lvgl\src\font</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="LVGL.Simulator.manifest" />
@@ -2050,6 +2068,21 @@
       <Filter>lv_drivers</Filter>
     </ClCompile>
     <ClCompile Include="LVGL.Simulator.cpp" />
+    <ClCompile Include="ui\ui.c">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\ui_helpers.c">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\ui_setting.c">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\ui_top.c">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="lvgl\src\font\use_font_loader.c">
+      <Filter>lvgl\src\font</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LVGL.Simulator.rc" />
@@ -6944,6 +6977,9 @@
     </Filter>
     <Filter Include="lv_drivers\win32drv">
       <UniqueIdentifier>{46dd1f5b-c62e-4ac6-98e3-a5ae1ef6ce82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui">
+      <UniqueIdentifier>{9b515c21-41cb-42a6-9371-c535b46211bf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

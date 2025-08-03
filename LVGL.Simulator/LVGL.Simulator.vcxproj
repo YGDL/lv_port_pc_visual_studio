@@ -260,7 +260,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)lv_drivers\wayland\wayland.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)lv_drivers\win32drv\win32drv.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)lv_drivers\win_drv.h" />
+    <ClInclude Include="lvgl\src\font\use_font_loader.h" />
     <ClInclude Include="lv_conf.h" />
+    <ClInclude Include="ui\ui.h" />
+    <ClInclude Include="ui\ui_events.h" />
+    <ClInclude Include="ui\ui_helpers.h" />
+    <ClInclude Include="ui\ui_setting.h" />
+    <ClInclude Include="ui\ui_top.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lv_drv_conf.h" />
@@ -721,6 +727,11 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)lv_drivers\win32drv\win32drv.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)lv_drivers\win_drv.c" />
     <ClCompile Include="LVGL.Simulator.cpp" />
+    <ClCompile Include="lvgl\src\font\use_font_loader.c" />
+    <ClCompile Include="ui\ui.c" />
+    <ClCompile Include="ui\ui_helpers.c" />
+    <ClCompile Include="ui\ui_setting.c" />
+    <ClCompile Include="ui\ui_top.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LVGL.Simulator.rc" />

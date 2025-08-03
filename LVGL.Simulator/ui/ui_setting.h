@@ -7,7 +7,7 @@ extern "C" {
 
 extern lv_obj_t * ui_setting_menu;
 
-extern void ui_setting_screen(lv_obj_t * parent);
+lv_obj_t* ui_setting_screen(lv_obj_t* parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/
