@@ -25,6 +25,7 @@
 #include "lvgl/examples/lv_examples.h"
 #include "lvgl/demos/lv_demos.h"
 #include "lv_drivers/win32drv/win32drv.h"
+#include "ui/ui.h"
 
 #if _MSC_VER >= 1200
 // Restore compilation warnings.
@@ -38,8 +39,8 @@ bool single_display_mode_initialization()
     if (!lv_win32_init(
         GetModuleHandleW(NULL),
         SW_SHOW,
-        800,
         480,
+        320,
         LoadIconW(GetModuleHandleW(NULL), MAKEINTRESOURCE(IDI_LVGL))))
     {
         return false;
@@ -66,8 +67,8 @@ unsigned int __stdcall lv_win32_window_thread_entrypoint(
     HINSTANCE instance_handle = GetModuleHandleW(NULL);
     int show_window_mode = SW_SHOW;
     HICON icon_handle = LoadIconW(instance_handle, MAKEINTRESOURCE(IDI_LVGL));
-    lv_coord_t hor_res = 800;
-    lv_coord_t ver_res = 450;
+    lv_coord_t hor_res = 480;
+    lv_coord_t ver_res = 320;
 
     wchar_t window_title[256];
     memset(window_title, 0, sizeof(window_title));
@@ -312,9 +313,9 @@ int main()
     // ----------------------------------
     // Demos from lv_examples
     // ----------------------------------
-
-    lv_demo_widgets();           // ok
-    //lv_demo_benchmark();
+    ui_init();
+    //lv_demo_widgets();           // ok
+    // lv_demo_benchmark();
     // lv_demo_keypad_encoder();    // ok
     // lv_demo_music();             // removed from repository
     // lv_demo_printer();           // removed from repository
@@ -425,7 +426,7 @@ int main()
 
     // lv_example_line_1();
 
-    // lv_example_list_1();
+    //lv_example_list_1();
 
     // lv_example_meter_1();
     // lv_example_meter_2();
