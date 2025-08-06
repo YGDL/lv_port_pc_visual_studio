@@ -4,12 +4,10 @@
 // Project name: ESP32_GPX
 
 #include "ui.h"
-#include "ui_helpers.h"
 
 ///////////////////// VARIABLES ////////////////////
 
 // EVENTS
-lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
 
@@ -29,16 +27,12 @@ lv_obj_t * ui____initial_actions0;
 
 void ui_init(void)
 {
+    /* 设置当前显示器的主题 */
     lv_disp_t * dispp = lv_disp_get_default();
-    lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
-                                               false, LV_FONT_DEFAULT);
+    lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
-    lv_obj_t* screen = lv_obj_create(NULL);
-    lv_scr_load(screen);
-    ui_setting_screen(screen);
-    //ui_Screen1_screen_init(screen);
-    ui____initial_actions0 = lv_obj_create(NULL);
-    lv_disp_load_scr(screen);
+
+    ui_page_stack(ui_desktop_page, NULL);
 }
 
 void ui_destroy(void)

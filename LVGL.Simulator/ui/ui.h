@@ -11,13 +11,12 @@ extern "C" {
 #endif
 
 #include "lvgl/lvgl.h"
-
-#include "ui_helpers.h"
-#include "ui_events.h"
+#include "ui_page_stack.h"
 
 
 ///////////////////// SCREENS ////////////////////
 
+#include "ui_desktop_page.h"
 #include "ui_top.h"
 #include "ui_setting.h"
 
@@ -26,7 +25,6 @@ extern "C" {
 
 // EVENTS
 
-extern lv_obj_t * ui____initial_actions0;
 
 // UI INIT
 void ui_init(void);
