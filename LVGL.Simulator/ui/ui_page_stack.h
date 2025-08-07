@@ -12,7 +12,10 @@ typedef struct page_stack_t {
     uint8_t page_state : 1;
 
     /* 页面初始化函数指针 */
-    lv_obj_t* (*page_point)(lv_obj_t* );
+    lv_obj_t* (*page_init_point)(lv_obj_t* );
+
+    /* 页面指针置空 */
+    void (*page_deinit_point)(void);
 
     /* 页面指针 */
     lv_obj_t* page_obj;
@@ -24,7 +27,8 @@ typedef struct page_stack_t {
     struct page_stack_t* last_page_stack;
 }page_stack_typedef;
 
-void ui_page_stack(lv_obj_t* (*next_page_point)(lv_obj_t*), lv_obj_t** focus_obj);
+void ui_page_stack(lv_obj_t* (*next_page_init_point)(lv_obj_t**), void (*next_page_deinit_point)(void), lv_obj_t** focus_obj);
+
 
 #ifdef __cplusplus
 } /*extern "C"*/

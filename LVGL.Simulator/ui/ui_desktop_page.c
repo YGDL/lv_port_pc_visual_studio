@@ -1,6 +1,11 @@
 ﻿#include "ui.h"
 
 /**************************************************************************************************************/
+/* 宏 */
+#define GPS_BUTTOM      1
+#define SETTING_BUTTOM  2
+
+/**************************************************************************************************************/
 /* 静态全局对象指针 */
 static lv_obj_t* ui_desktop_screen = NULL;
 static lv_obj_t* ui_desktop_container = NULL;
@@ -35,7 +40,7 @@ static lv_obj_t* ui_buttom_19 = NULL;
 
 /**************************************************************************************************************/
 /* 回调函数组 */
-static void ui_setting_buttom_cb(lv_event_t* e);
+static void ui_desktop_buttom_cb(lv_event_t* e);
 
 
 
@@ -48,7 +53,7 @@ static void ui_setting_buttom_cb(lv_event_t* e);
  * @param[in] focus_obj 当前页聚焦对象，若无聚焦对象，输入NULL
  * @return ui_desktop_screen desktop页面静态指针，用于页面栈加载屏幕
  */
-lv_obj_t* ui_desktop_page(lv_obj_t** focus_obj)
+lv_obj_t* ui_desktop_init_page(lv_obj_t** focus_obj)
 {
     /* 创建desktop屏幕页面 */
     ui_desktop_screen = lv_obj_create(NULL);
@@ -72,6 +77,7 @@ lv_obj_t* ui_desktop_page(lv_obj_t** focus_obj)
     /* 创建按钮对象 */
     /* GPS按钮 */
     ui_gps_buttom = lv_btn_create(ui_bottom_container);
+    ui_gps_buttom->user_data = GPS_BUTTOM;
     lv_obj_set_size(ui_gps_buttom, 70, 70);
     lv_obj_add_flag(ui_gps_buttom, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
     lv_obj_set_style_bg_color(ui_gps_buttom, lv_color_hex(0x8BCC77), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -84,8 +90,11 @@ lv_obj_t* ui_desktop_page(lv_obj_t** focus_obj)
     lv_label_set_text(ui_gps_buttom_lebel, "GPS");
     lv_obj_set_style_text_color(ui_gps_buttom_lebel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    lv_obj_add_event_cb(ui_gps_buttom, ui_desktop_buttom_cb, LV_EVENT_CLICKED, &ui_gps_buttom);
+
     /* 设置按钮 */
     ui_setting_buttom = lv_btn_create(ui_bottom_container);
+    ui_setting_buttom->user_data = SETTING_BUTTOM;
     lv_obj_set_size(ui_setting_buttom, 70, 70);
     lv_obj_add_flag(ui_setting_buttom, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
     lv_obj_set_style_bg_color(ui_setting_buttom, lv_color_hex(0x8BCC77), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -98,7 +107,7 @@ lv_obj_t* ui_desktop_page(lv_obj_t** focus_obj)
     lv_label_set_text(ui_setting_buttom_lebel, "SET");
     lv_obj_set_style_text_color(ui_setting_buttom_lebel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_add_event_cb(ui_setting_buttom, ui_setting_buttom_cb, LV_EVENT_CLICKED, &ui_setting_buttom);
+    lv_obj_add_event_cb(ui_setting_buttom, ui_desktop_buttom_cb, LV_EVENT_CLICKED, &ui_setting_buttom);
 
     /* 设置按钮 */
     ui_buttom_1 = lv_btn_create(ui_bottom_container);
@@ -234,6 +243,46 @@ lv_obj_t* ui_desktop_page(lv_obj_t** focus_obj)
     return ui_desktop_screen;
 }
 
+/**
+ * @brief 删除页面对象，重置所有对象指针
+ *
+ * 重置所有静态指针
+ * 
+ */
+void ui_desktop_deinit_page(void)
+{
+    if (ui_desktop_screen) lv_obj_del_delayed(ui_desktop_screen, 1000);
+
+    /* 静态全局对象指针 */
+    ui_desktop_screen = NULL;
+    ui_desktop_container = NULL;
+    ui_top_container = NULL;
+    ui_bottom_container = NULL;
+
+    /* 应用按钮对象 */
+    ui_gps_buttom = NULL;
+    ui_setting_buttom = NULL;
+    ui_buttom_1 = NULL;
+    ui_buttom_2 = NULL;
+    ui_buttom_3 = NULL;
+    ui_buttom_4 = NULL;
+    ui_buttom_5 = NULL;
+    ui_buttom_6 = NULL;
+    ui_buttom_7 = NULL;
+    ui_buttom_8 = NULL;
+    ui_buttom_9 = NULL;
+    ui_buttom_10 = NULL;
+    ui_buttom_11 = NULL;
+    ui_buttom_12 = NULL;
+    ui_buttom_13 = NULL;
+    ui_buttom_14 = NULL;
+    ui_buttom_15 = NULL;
+    ui_buttom_16 = NULL;
+    ui_buttom_17 = NULL;
+    ui_buttom_18 = NULL;
+    ui_buttom_19 = NULL;
+}
+
 /**************************************************************************************************************/
 /**
  * @brief 设置按钮回调函数
@@ -243,7 +292,21 @@ lv_obj_t* ui_desktop_page(lv_obj_t** focus_obj)
  * @param[in] e 事件句柄
  * @return 无返回值
  */
-static void ui_setting_buttom_cb(lv_event_t* e)
+static void ui_desktop_buttom_cb(lv_event_t* e)
 {
-    ui_page_stack(ui_setting_page, e->user_data);
+    switch ((uint16_t)(e->target->user_data))
+    {
+        case GPS_BUTTOM:
+            ui_page_stack(ui_gps_init_page, ui_gps_deinit_page, e->user_data);
+            break;
+
+        case SETTING_BUTTOM:
+            ui_page_stack(ui_setting_page, ui_setting_deinit_page, e->user_data);
+            break;
+
+        default:
+
+            break;
+    }
+        
 }

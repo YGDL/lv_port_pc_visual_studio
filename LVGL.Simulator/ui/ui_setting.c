@@ -1,5 +1,4 @@
 ﻿#include "ui.h"
-#include "ui_top.h"
 
 lv_obj_t* ui_setting_container;
 lv_obj_t* ui_menu;
@@ -24,6 +23,7 @@ static lv_indev_t* touch_device;
 static lv_indev_t* button_device;
 
 // 全局指针，便于销毁遮罩和list
+static lv_obj_t* menu = NULL;
 static lv_obj_t* mask = NULL;
 static lv_obj_t* list = NULL;
 
@@ -32,6 +32,55 @@ static uint8_t max_connect_array[] = {
     1, 2, 3, 4, 5
 };
 
+/* 静态全局 */
+static void ui_audio_page(lv_obj_t* parent);
+
+
+
+/* 回调函数组 */
+static void root_back_bottom_cb(lv_event_t* e);
+
+
+/**********************************************************************************************************************************/
+// 按钮回调函数
+static void audio_button_cb(lv_event_t* e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t* btn = lv_event_get_target(e);
+    lv_obj_t* user_data = lv_event_get_user_data(e); // 获取另一个按钮的指针
+
+    if (code == LV_EVENT_CLICKED) {
+        // 设置当前按钮为选中状态
+        lv_obj_add_state(btn, LV_STATE_CHECKED);
+        lv_obj_set_style_bg_color(btn, lv_color_white(), LV_STATE_CHECKED);
+        lv_obj_set_style_outline_width(btn, 2, LV_STATE_CHECKED);
+        lv_obj_set_style_outline_color(btn, lv_color_hex(0x8BC5F4), LV_STATE_CHECKED);
+        lv_obj_set_style_text_color(lv_obj_get_child(btn, 0), lv_color_hex(0x8BC5F4), 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(btn, 1), lv_color_hex(0x8BC5F4), 0);
+        
+        // 清除另一个按钮的选中状态
+        lv_obj_clear_state(user_data, LV_STATE_CHECKED);
+        lv_obj_set_style_bg_color(user_data, lv_color_hex(0xEBEBEB), 0); // 灰色背景
+        lv_obj_set_style_outline_width(user_data, 0, 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(user_data, 0), lv_color_hex(0xC4C4C4), 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(user_data, 1), lv_color_hex(0xC4C4C4), 0);
+    }
+}
+
+// 焦点变化回调函数
+static void focus_cb(lv_group_t* group)
+{
+    lv_obj_t* focused = lv_group_get_focused(group);
+    if (!focused) return;
+
+    // 方法1：直接滚动到对象
+    //lv_obj_scroll_to_view(focused, LV_ANIM_ON);
+
+    // 方法2：递归滚动（适用于嵌套容器）
+    lv_obj_scroll_to_view_recursive(focused, LV_ANIM_ON);
+}
+
+/* 回调函数组 */
 static void anim_y_cb(void* var, int32_t v)
 {
     lv_obj_set_y(var, v);
@@ -317,14 +366,118 @@ static lv_obj_t* create_switch(lv_obj_t* parent, const char* icon, const char* t
     return obj;
 }
 
-lv_obj_t* ui_setting_screen(lv_obj_t * parent)
+/**********************************************************************************************************************************/
+/* 子项菜单页 */
+
+/* 音频菜单设置单页 */
+static void ui_audio_page(lv_obj_t* parent)
+{
+    lv_obj_t* section = lv_menu_section_create(parent);    /* 创建一个新的菜单节 */
+
+    /* 音频状态设置容器 */
+    lv_obj_t* audio_state_container = lv_menu_cont_create(section);
+    lv_obj_set_size(audio_state_container, LV_PCT(100), 100); /* 设置菜单的大小为父容器的100% */
+    lv_obj_set_flex_flow(audio_state_container, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(audio_state_container, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    /* 创建音频状态开关 */
+    // 创建第一个按钮
+    lv_obj_t* btn1 = lv_btn_create(audio_state_container);
+    lv_obj_set_size(btn1, LV_PCT(35), LV_PCT(90));
+    lv_obj_set_flex_flow(btn1, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(btn1, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_t* icon1 = lv_img_create(btn1);
+    lv_img_set_src(icon1, LV_SYMBOL_VOLUME_MAX);
+    lv_obj_t* label1 = lv_label_create(btn1);
+    lv_label_set_text(label1, "Button 1");
+
+    lv_group_add_obj(setting_group, btn1);
+
+    // 创建第一个按钮
+    lv_obj_t* btn2 = lv_btn_create(audio_state_container);
+    lv_obj_set_size(btn2, LV_PCT(35), LV_PCT(90));
+    lv_obj_set_flex_flow(btn2, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(btn2, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_t* icon2 = lv_img_create(btn2);
+    lv_img_set_src(icon2, LV_SYMBOL_MUTE);
+    lv_obj_t* label2 = lv_label_create(btn2);
+    lv_label_set_text(label2, "Button 2");
+
+    lv_group_add_obj(setting_group, btn2);
+
+    // 设置按钮的初始样式
+    // 默认状态样式
+    lv_obj_set_style_bg_color(btn1, lv_color_hex(0xEBEBEB), 0); // 灰色背景
+    lv_obj_set_style_bg_color(btn2, lv_color_hex(0xEBEBEB), 0); // 灰色背景
+
+    // 选中状态样式
+    lv_obj_set_style_bg_color(btn1, lv_color_white(), LV_STATE_CHECKED);
+    lv_obj_set_style_bg_color(btn2, lv_color_white(), LV_STATE_CHECKED);
+    lv_obj_set_style_outline_width(btn1, 2, LV_STATE_CHECKED);
+    lv_obj_set_style_outline_width(btn2, 2, LV_STATE_CHECKED);
+    lv_obj_set_style_outline_color(btn1, lv_color_hex(0x8BC5F4), LV_STATE_CHECKED);
+    lv_obj_set_style_outline_color(btn2, lv_color_hex(0x8BC5F4), LV_STATE_CHECKED);
+
+    // 设置按钮1初始为选中状态
+    lv_obj_add_state(btn1, LV_STATE_CHECKED);
+    lv_obj_set_style_text_color(lv_obj_get_child(btn1, 0), lv_color_hex(0x8BC5F4), 0);
+    lv_obj_set_style_text_color(lv_obj_get_child(btn1, 1), lv_color_hex(0x8BC5F4), 0);
+    lv_obj_set_style_text_color(lv_obj_get_child(btn2, 0), lv_color_hex(0xC4C4C4), 0);
+    lv_obj_set_style_text_color(lv_obj_get_child(btn2, 1), lv_color_hex(0xC4C4C4), 0);
+
+    // 添加事件回调，互相传递对方按钮的指针作为用户数据
+    lv_obj_add_event_cb(btn1, audio_button_cb, LV_EVENT_ALL, btn2);
+    lv_obj_add_event_cb(btn2, audio_button_cb, LV_EVENT_ALL, btn1);
+
+    /* 音频播放值设置容器 */
+    lv_obj_t* audio_value_container = lv_menu_cont_create(section);
+
+    lv_obj_set_size(audio_value_container, LV_PCT(100), 400); /* 设置菜单的大小为父容器的100% */
+    lv_obj_set_flex_flow(audio_value_container, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(audio_value_container, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t* ring_label = lv_label_create(audio_value_container);
+    lv_label_set_text(ring_label, "Button 1");
+
+    lv_obj_t* ring_slider = lv_slider_create(audio_value_container);
+    lv_slider_set_range(ring_slider, 0, 100);
+    lv_slider_set_value(ring_slider, 50, LV_ANIM_ON);
+    lv_obj_set_size(ring_slider, LV_PCT(90), 5);
+    lv_obj_set_style_bg_color(ring_slider, lv_color_hex(0xB0B0B0), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(ring_slider, lv_color_hex(0xFFFFFF), LV_PART_KNOB);
+    lv_obj_set_style_border_color(ring_slider, lv_color_hex(0x2095F6), LV_PART_KNOB);
+    lv_obj_set_style_border_width(ring_slider, 4, LV_PART_KNOB);
+
+    lv_group_add_obj(setting_group, ring_slider);
+
+    lv_obj_t* notify_label = lv_label_create(audio_value_container);
+    lv_label_set_text(notify_label, "Button 1");
+
+    lv_obj_t* notify_slider = lv_slider_create(audio_value_container);
+    lv_slider_set_range(notify_slider, 0, 100);
+    lv_slider_set_value(notify_slider, 50, LV_ANIM_ON);
+    lv_obj_set_size(notify_slider, LV_PCT(90), 5);
+    lv_obj_set_style_bg_color(notify_slider, lv_color_hex(0xB0B0B0), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(notify_slider, lv_color_hex(0xFFFFFF), LV_PART_KNOB);
+    lv_obj_set_style_border_color(notify_slider, lv_color_hex(0x2095F6), LV_PART_KNOB);
+    lv_obj_set_style_border_width(notify_slider, 4, LV_PART_KNOB);
+
+    lv_group_add_obj(setting_group, notify_slider);
+    //lv_group_set_focus_cb(setting_group, focus_cb);
+}
+
+
+
+/**********************************************************************************************************************************/
+/* 根菜单页 */
+lv_obj_t* ui_setting_page(lv_obj_t** focus_obj)
 {
     /* 获取输入设备 */
     /* 使用鼠标滚轮作为输入设备，用于模拟按键输入设备 */
     touch_device = get_input_device(LV_INDEV_TYPE_POINTER);
     button_device = get_input_device(LV_INDEV_TYPE_ENCODER);
 
-    ui_setting_container = lv_obj_create(parent); /* 创建新页面的容器 */
+    ui_setting_container = lv_obj_create(NULL); /* 创建新页面的容器 */
     lv_obj_remove_style_all(ui_setting_container); /* 移除默认样式 */
     lv_obj_set_size(ui_setting_container, LV_PCT(100), LV_PCT(100)); /* 设置菜单的大小为父容器的100% */
     lv_obj_set_flex_flow(ui_setting_container, LV_FLEX_FLOW_COLUMN);
@@ -342,8 +495,10 @@ lv_obj_t* ui_setting_screen(lv_obj_t * parent)
     lv_obj_align(ui_menu_container, LV_ALIGN_BOTTOM_MID, 0, 0);     /* 将容器对齐到父容器的顶部中间 */
     lv_obj_set_size(ui_menu_container, LV_PCT(100), LV_PCT(90));    /* 设置菜单容器的大小为父容器的100% */
 
+
+    /*****************************************************************************************************************************/
     /* 创建菜单控件 */
-    lv_obj_t * menu = lv_menu_create(ui_menu_container);
+    menu = lv_menu_create(ui_menu_container);
     lv_obj_set_size(menu, LV_PCT(100), LV_PCT(100)); /* 设置菜单容器的大小为父容器的100% */
 
     lv_color_t bg_color = lv_obj_get_style_bg_color(menu, 0);
@@ -355,7 +510,7 @@ lv_obj_t* ui_setting_screen(lv_obj_t * parent)
     }
 
     lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN_ENABLED);
-    //lv_obj_add_event_cb(menu, back_event_handler, LV_EVENT_CLICKED, menu);
+    lv_obj_add_event_cb(menu, root_back_bottom_cb, LV_EVENT_CLICKED, menu);
 
     lv_obj_t * cont;
     lv_obj_t * section;
@@ -397,8 +552,9 @@ lv_obj_t* ui_setting_screen(lv_obj_t * parent)
     section = lv_menu_section_create(wifi_sta_page); /* 创建一个新的菜单节 */
     create_switch(section, LV_SYMBOL_AUDIO, "Wi-Fi STA", false);
 
-    /*************************************************************************************************/
+    /************************************************************************************************************************/
     /* 创建设置子页 */
+
     /* Wi-Fi设置子页 */
     lv_obj_t * wifi_page = lv_menu_page_create(menu, "Wi-Fi Setting");
 
@@ -418,15 +574,29 @@ lv_obj_t* ui_setting_screen(lv_obj_t * parent)
 
     lv_group_add_obj(setting_group, cont); /* 将菜单添加到group中 */
 
+    /***************************************************************/
+    /* 创建音频设置页 */
+    lv_obj_t* audio_page = lv_menu_page_create(menu, "Audio Setting");
+
+    lv_obj_set_style_pad_hor(audio_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), 0), 0);
+    lv_menu_separator_create(audio_page);
+
+    ui_audio_page(audio_page); /* 在新页容器里创建音频设置页 */
+
+    /***************************************************************/
     /* 关于页 */
     lv_obj_t* about_page = lv_menu_page_create(menu, "About");
     lv_obj_set_style_pad_hor(about_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), 0), 0);
+    
 
     section = lv_menu_section_create(about_page);    /* 创建一个新的菜单节 */
     create_text(section, NULL, "ESP32-GPX Version 1.0.0", true);
 
+    /*********************************************************************************************************************************/
+
     /* 创建一个设置基础页 */
     setting_page = lv_menu_page_create(menu, "Settings");
+    setting_page->user_data = 1;
     lv_obj_set_style_pad_hor(setting_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), 0), 0);
     // 设置菜单页面布局 - 垂直Flex布局
     lv_obj_set_flex_flow(setting_page, LV_FLEX_FLOW_COLUMN);
@@ -451,7 +621,7 @@ lv_obj_t* ui_setting_screen(lv_obj_t * parent)
     section = lv_menu_section_create(setting_page);
     cont = create_text(section, LV_SYMBOL_BELL, "Audio", false);
 
-    lv_menu_set_load_page_event(menu, cont, wifi_page);
+    lv_menu_set_load_page_event(menu, cont, audio_page);
 
     lv_group_add_obj(setting_group, cont); /* 将菜单添加到group中 */
 
@@ -479,4 +649,23 @@ lv_obj_t* ui_setting_screen(lv_obj_t * parent)
     lv_menu_set_page(menu, setting_page);
 
     return ui_setting_container;
+}
+
+void ui_setting_deinit_page(void)
+{
+    if (ui_setting_container) lv_obj_del_delayed(ui_setting_container, 1000);
+
+    ///* 静态全局对象指针 */
+    //ui_setting_container = NULL;
+}
+
+/**
+ * @brief 
+ * @param e 
+ */
+static void root_back_bottom_cb(lv_event_t* e)
+{
+    lv_obj_t* page;
+    page = lv_menu_get_cur_main_page(menu);
+    ui_page_stack(ui_desktop_init_page, ui_desktop_deinit_page, NULL);
 }

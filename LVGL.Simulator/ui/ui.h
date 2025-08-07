@@ -18,6 +18,7 @@ extern "C" {
 
 #include "ui_desktop_page.h"
 #include "ui_top.h"
+#include "ui_gps_page.h"
 #include "ui_setting.h"
 
 ///////////////////// VARIABLES ////////////////////

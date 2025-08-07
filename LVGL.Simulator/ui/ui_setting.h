@@ -7,7 +7,8 @@ extern "C" {
 
 extern lv_obj_t * ui_setting_menu;
 
-lv_obj_t* ui_setting_screen(lv_obj_t* parent);
+lv_obj_t* ui_setting_page(lv_obj_t** focus_obj);
+void ui_setting_deinit_page(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

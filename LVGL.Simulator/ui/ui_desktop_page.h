@@ -7,7 +7,8 @@ extern "C" {
 
 #include "lvgl/lvgl.h"
 
-lv_obj_t* ui_desktop_page(lv_obj_t** focus_obj);
+lv_obj_t* ui_desktop_init_page(lv_obj_t** focus_obj);
+void ui_desktop_deinit_page(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/
